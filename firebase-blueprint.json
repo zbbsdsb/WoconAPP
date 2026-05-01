@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Public profile information for Wocon explorers.",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "avatar_url": { "type": "string" },
+        "bio": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["username", "email"]
+    },
+    "Trip": {
+      "title": "Journey",
+      "description": "A travel expedition planned by a user.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "destination": { "type": "string" },
+        "start_date": { "type": "string" },
+        "end_date": { "type": "string" },
+        "creator_id": { "type": "string" },
+        "is_public": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["planning", "ongoing", "completed"] },
+        "coordinates": { "type": "array", "items": { "type": "number" } },
+        "cover_url": { "type": "string" },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "creator_id", "status"]
+    },
+    "ItineraryItem": {
+      "title": "Journey Step",
+      "description": "An activity, transport, or lodging entry within a trip.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "time": { "type": "string" },
+        "location_name": { "type": "string" },
+        "coordinates": { "type": "array", "items": { "type": "number" } },
+        "note": { "type": "string" },
+        "type": { "type": "string", "enum": ["activity", "transport", "lodging", "food"] },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "type"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/trips/{tripId}": {
+      "schema": "Trip",
+      "description": "Master trip documents."
+    },
+    "/trips/{tripId}/itinerary/{itemId}": {
+      "schema": "ItineraryItem",
+      "description": "Subcollection for trip itinerary items."
+    }
+  }
+}

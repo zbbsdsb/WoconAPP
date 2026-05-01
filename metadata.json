@@ -1,0 +1,6 @@
+{
+  "name": "Wocon",
+  "description": "A map-first travel social platform for discovering destinations and finding trip companions.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["Interactive Maps", "Social Connectivity", "Trip Planning"]
+}

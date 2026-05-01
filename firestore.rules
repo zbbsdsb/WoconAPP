@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 0.1 Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.username is string && data.username.size() <= 50 &&
+               data.email is string && data.email.size() <= 100;
+      }
+
+      allow get: if isSignedIn();
+      allow list: if false; // Users cannot be listed for privacy
+      allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().keys().size() >= 2;
+      allow update: if isOwner(userId) && isValidUser(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['username', 'avatar_url', 'bio']);
+    }
+
+    // 2. Trips Collection
+    match /trips/{tripId} {
+      function isValidTrip(data) {
+        return data.title is string && data.title.size() <= 100 &&
+               data.creator_id is string && data.creator_id == request.auth.uid &&
+               data.status in ['planning', 'ongoing', 'completed'] &&
+               (data.get('description', '') is string) &&
+               (data.get('destination', '') is string);
+      }
+
+      // Public read if is_public, else creator or participant only
+      allow get: if resource.data.is_public == true || 
+                 isOwner(resource.data.creator_id) || 
+                 (isSignedIn() && request.auth.uid in resource.data.participants);
+      
+      allow list: if resource.data.is_public == true || 
+                  isOwner(resource.data.creator_id) || 
+                  (isSignedIn() && request.auth.uid in resource.data.participants);
+
+      allow create: if isSignedIn() && isValidTrip(incoming());
+      
+      allow update: if (isOwner(existing().creator_id) || isSignedIn() && request.auth.uid in existing().participants) &&
+                    isValidTrip(incoming()) &&
+                    incoming().creator_id == existing().creator_id;
+
+      allow delete: if isOwner(existing().creator_id);
+
+      // 3. Itinerary Subcollection
+      match /itinerary/{itemId} {
+        function isValidItem(data) {
+          return data.title is string && data.title.size() <= 100 &&
+                 data.type in ['activity', 'transport', 'lodging', 'food'];
+        }
+
+        function canAccessTrip() {
+          let trip = get(/databases/$(database)/documents/trips/$(tripId)).data;
+          return trip.is_public == true || 
+                 trip.creator_id == request.auth.uid || 
+                 (isSignedIn() && request.auth.uid in trip.participants);
+        }
+
+        function canWriteTrip() {
+          let trip = get(/databases/$(database)/documents/trips/$(tripId)).data;
+          return trip.creator_id == request.auth.uid || 
+                 (isSignedIn() && request.auth.uid in trip.participants);
+        }
+
+        allow read: if canAccessTrip();
+        allow write: if canWriteTrip() && isValidItem(incoming());
+      }
+    }
+  }
+}
