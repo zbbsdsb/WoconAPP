@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -28,16 +28,28 @@ const MapController = ({ center, zoom }: { center: [number, number], zoom: numbe
   return null;
 };
 
+// Component to handle map clicks
+const MapEvents = ({ onClick }: { onClick?: (latlng: L.LatLng) => void }) => {
+  useMapEvents({
+    click(e) {
+      onClick?.(e.latlng);
+    },
+  });
+  return null;
+};
+
 interface MapCanvasProps {
   center?: [number, number];
   zoom?: number;
-  markers?: Array<{
+  trips?: Array<{
     id: string | number;
-    position: [number, number];
+    lat: number;
+    lng: number;
     title: string;
     description: string;
   }>;
   onMarkerClick?: (id: string | number) => void;
+  onMapClick?: (latlng: L.LatLng) => void;
   variant?: 'dark' | 'satellite' | 'street';
 }
 
@@ -59,8 +71,9 @@ const TILE_LAYERS = {
 export const MapCanvas: React.FC<MapCanvasProps> = ({ 
   center = [20, 0], 
   zoom = 3,
-  markers = [],
+  trips = [],
   onMarkerClick,
+  onMapClick,
   variant = 'dark'
 }) => {
   const layer = TILE_LAYERS[variant];
@@ -75,25 +88,26 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         className="w-full h-full z-0"
       >
         <MapController center={center as [number, number]} zoom={zoom} />
+        <MapEvents onClick={onMapClick} />
         <TileLayer
           attribution={layer.attribution}
           url={layer.url}
         />
         <ZoomControl position="bottomright" />
         
-        {markers.map(marker => (
+        {trips.map(trip => (
           <Marker 
-            key={marker.id} 
-            position={marker.position as [number, number]}
+            key={trip.id} 
+            position={[trip.lat, trip.lng]}
             eventHandlers={{
-              click: () => onMarkerClick?.(marker.id)
+              click: () => onMarkerClick?.(trip.id)
             }}
           >
             <Popup>
               <div className="text-slate-900 font-sans p-1">
-                <h3 className="font-bold border-b pb-1 mb-1">{marker.title}</h3>
-                <p className="text-[10px] text-slate-600 leading-tight">{marker.description}</p>
-                <button className="mt-2 w-full py-1 bg-blue-600 text-white text-[10px] rounded font-bold uppercase tracking-wider">Join Trip</button>
+                <h3 className="font-bold border-b pb-1 mb-1">{trip.title}</h3>
+                <p className="text-[10px] text-slate-600 leading-tight">{trip.description}</p>
+                <button className="mt-2 w-full py-1 bg-blue-600 text-white text-[10px] rounded font-bold uppercase tracking-wider">Mission Details</button>
               </div>
             </Popup>
           </Marker>

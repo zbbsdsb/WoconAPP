@@ -11,10 +11,12 @@ import {
   TrendingUp,
   X,
   Loader2,
-  Users
+  Users,
+  Plus
 } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { MapCanvas } from '../components/map/MapCanvas';
+import { TripCreationWizard } from '../components/trip/TripCreationWizard';
 import { WoconAPI } from '../services/api';
 import { Trip } from '../types';
 
@@ -29,6 +31,7 @@ export const MapPage: React.FC = () => {
   const [mapVariant, setMapVariant] = useState<'dark' | 'satellite' | 'street'>('dark');
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
   
   const [mapState, setMapState] = useState<{ center: [number, number], zoom: number }>({
     center: [20, 0],
@@ -75,6 +78,14 @@ export const MapPage: React.FC = () => {
     const sequence: Array<'dark' | 'satellite' | 'street'> = ['dark', 'satellite', 'street'];
     const nextIndex = (sequence.indexOf(mapVariant) + 1) % sequence.length;
     setMapVariant(sequence[nextIndex]);
+  };
+
+  const handleCreateTrip = async (data: any) => {
+    const tripId = await WoconAPI.createTrip(data);
+    if (tripId) {
+      setIsWizardOpen(false);
+      navigate(`/trips/${tripId}`);
+    }
   };
 
   return (
@@ -217,6 +228,23 @@ export const MapPage: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Create Trip FAB */}
+      <motion.button 
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsWizardOpen(true)}
+        className="fixed bottom-10 right-10 bg-blue-600 hover:bg-blue-500 text-white p-6 rounded-full shadow-2xl shadow-blue-600/30 flex items-center space-x-3 z-50 group border border-blue-400/20"
+      >
+        <Plus size={28} className="group-hover:rotate-90 transition-transform duration-500" />
+        <span className="font-black text-[10px] uppercase tracking-widest pr-2">Launch Journey</span>
+      </motion.button>
+
+      <TripCreationWizard 
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onComplete={handleCreateTrip}
+      />
     </div>
   );
 };

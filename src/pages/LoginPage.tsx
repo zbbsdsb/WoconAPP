@@ -21,8 +21,8 @@ export const LoginPage: React.FC = () => {
       {/* Editorial Left Side */}
       <div className="relative flex-1 p-16 md:p-24 flex flex-col justify-between z-10">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shrink-0 shadow-xl shadow-blue-600/30">
-            <span className="font-black text-2xl tracking-tighter italic text-white">W</span>
+          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-2xl overflow-hidden">
+            <img src="/logo.png" alt="Wocon Logo" className="w-8 h-8 object-contain" />
           </div>
           <span className="font-black text-2xl tracking-tight text-white uppercase font-display">Wocon</span>
         </div>

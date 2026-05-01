@@ -55,8 +55,8 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
         className="relative flex flex-col py-8 bg-[#0a0a0a] border-r border-white/5 z-50 px-4"
       >
         <div className="mb-12 flex items-center shrink-0">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30">
-            <span className="font-black text-2xl tracking-tighter italic">W</span>
+          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-2xl overflow-hidden">
+            <img src="/logo.png" alt="Wocon Logo" className="w-8 h-8 object-contain" />
           </div>
           <AnimatePresence>
             {isExpanded && (
@@ -64,7 +64,7 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
                 initial={{ opacity: 0, x: -10 }} 
                 animate={{ opacity: 1, x: 0 }} 
                 exit={{ opacity: 0, x: -10 }}
-                className="ml-4 font-black text-2xl tracking-tight font-display"
+                className="ml-4 font-black text-2xl tracking-tight font-display text-white"
               >
                 Wocon
               </motion.span>
