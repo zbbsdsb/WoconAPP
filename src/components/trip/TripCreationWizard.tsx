@@ -4,7 +4,7 @@ import {
   X, MapPin, Calendar, Lock, Globe, 
   ArrowRight, ArrowLeft, Search, Loader2,
   CheckCircle2, Sparkles, Plane,
-  Maximize2, Compass
+  Maximize2
 } from 'lucide-react';
 import { WoconAPI } from '../../services/api';
 import { MapCanvas } from '../map/MapCanvas';
@@ -351,26 +351,6 @@ export const TripCreationWizard: React.FC<WizardProps> = ({ isOpen, onClose, onC
               />
               
               <div className="absolute inset-0 pointer-events-none border-l border-white/5" />
-              
-              <div className="absolute top-12 right-12 z-20 space-y-4">
-                 <div className="glass-card rounded-[32px] p-8 w-64 shadow-2xl backdrop-blur-3xl">
-                    <div className="flex items-center space-x-3 mb-6 text-blue-500 font-black text-[10px] uppercase tracking-widest">
-                       <Compass size={18} />
-                       <span>Navigation Node</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed font-bold italic font-serif mb-6">Real-time coordinate tracking enabled. Tap the map to inject custom coordinates.</p>
-                    <div className="space-y-4 pt-6 border-t border-white/10">
-                       <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Sync Status</span>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                       </div>
-                       <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Protocol</span>
-                          <span className="text-[9px] font-mono text-slate-400">WCN-256</span>
-                       </div>
-                    </div>
-                 </div>
-              </div>
            </div>
         </div>
       </motion.div>
